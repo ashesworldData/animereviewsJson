@@ -3,96 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub File Updater</title>
-    <!-- Tailwind CSS CDN for basic styling -->
+    <title>Anime Review Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for Inter font and rounded corners */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
+        body { font-family: 'Inter', sans-serif; }
+        .search-result-item:hover { background-color: #e0e7ff; }
+        #searchResultsContainer { max-height: 300px; overflow-y: auto; }
+        /* Custom scrollbar for search results */
+        #searchResultsContainer::-webkit-scrollbar {
+            width: 8px;
+        }
+        #searchResultsContainer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        #searchResultsContainer::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        #searchResultsContainer::-webkit-scrollbar-thumb:hover {
+            background: #555;
+            }
+        .card {
+            background-color: #ffffff; /* bg-white */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 1.5rem; /* p-6 */
+        }
+        /* Styles for AI client section */
+        #promptInput {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #374151;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            resize: vertical;
+        }
+        /* Make resultOutput editable */
+        #resultOutput {
+            width: 100%; /* Ensure it takes full width */
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem; /* Slightly smaller font than promptInput */
+            line-height: 1.4;
+            color: #4b5563;
+            background-color: #f3f4f6;
+            resize: vertical; /* Allow vertical resizing */
+            min-height: 100px; /* Ensure some visibility */
+        }
+
+        #submitBtn, #addAiReviewBtn, .action-button { /* Apply similar styling to all action buttons */
+            display: inline-flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
-        .input-area, .button-area {
-            margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            resize: vertical; /* Allow vertical resizing */
-            min-height: 120px; /* Minimum height for textarea */
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
-        }
-        button {
-            background-color: #4f46e5; /* Indigo-600 */
-            color: white;
-            padding: 12px 25px;
-            border-radius: 8px;
+            width: auto;
+            min-width: 120px; /* Ensure button has a minimum width */
+            padding: 0.75rem 1.5rem;
             font-weight: 600;
-            font-size: 1rem;
+            color: white;
+            background-color: #4f46e5; /* indigo-600 */
+            border: none;
+            border-radius: 0.375rem;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); /* Shadow for button */
+            transition: background-color 0.15s ease-in-out;
         }
-        button:hover {
-            background-color: #4338ca; /* Indigo-700 */
-            transform: translateY(-1px);
+        #submitBtn:hover, #addAiReviewBtn:hover, .action-button:hover {
+            background-color: #4338ca; /* indigo-700 */
         }
-        button:active {
-            transform: translateY(0);
-            box-shadow: none;
+        #submitBtn:disabled, #addAiReviewBtn:disabled, .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
-        .message-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            text-align: left;
-            word-break: break-all; /* Break long words */
+        /* Specific style for success button (e.g., Add AI Review) */
+        #addAiReviewBtn {
+            background-color: #10b981; /* green-500 */
         }
-        .message-success {
-            background-color: #d1fae5; /* Green-100 */
-            color: #065f46; /* Green-800 */
-            border: 1px solid #34d399; /* Green-400 */
+        #addAiReviewBtn:hover {
+            background-color: #059669; /* green-600 */
         }
-        .message-error {
-            background-color: #fee2e2; /* Red-100 */
-            color: #991b1b; /* Red-800 */
-            border: 1px solid #ef4444; /* Red-400 */
-        }
-        .message-info {
-            background-color: #e0f2fe; /* Blue-100 */
-            color: #1e40af; /* Blue-800 */
-            border: 1px solid #60a5fa; /* Blue-400 */
-        }
+
+        /* Styles for loading spinner in buttons */
         .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #fff;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             animation: spin 1s linear infinite;
+            margin-left: 8px;
             display: inline-block;
             vertical-align: middle;
-            margin-left: 8px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -105,75 +109,731 @@
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">GitHub File Updater</h1>
-        <p class="text-gray-600 mb-6">
-            Enter text below and click "Update" to modify `updatetext.text` in your GitHub repository.
-            <br>
-            <strong class="text-red-600">WARNING: Your Personal Access Token (PAT) will be exposed in this client-side code. This is NOT secure for production use.</strong>
-        </p>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col items-center py-8 px-4">
 
-        <div class="input-area">
-            <textarea id="fileContent" placeholder="Enter new content for updatetext.text..." class="focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
-        </div>
+    <div class="container mx-auto max-w-4xl w-full space-y-8">
+        <header class="text-center">
+            <h1 class="text-4xl font-bold text-indigo-700">Anime Review Manager</h1>
+        </header>
 
-        <div class="button-area">
-            <button id="updateButton">
-                <span class="button-content">
-                    Update File
-                    <span id="loadingSpinner" class="loading-spinner hidden"></span>
-                </span>
-            </button>
-        </div>
+        <main class="space-y-8">
+            <section id="dataLoadingSection" class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-600">1. Load Your Data</h2>
+                <p class="mb-4 text-gray-600">
+                    This application will attempt to load your anime database file (`allAnime.json`) automatically from the root of where this page is served (e.g., your 'public' folder if using a local server). It will also attempt to load existing reviews from a remote `animereviews.json` file. If automatic loading fails, or to load a different file, you can use the file input below. This application operates locally in your browser; your files are not uploaded to any server.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="animeDbFile" class="block text-sm font-medium text-gray-700 mb-1">Anime Database (.json):</label>
+                        <input type="file" id="animeDbFile" accept=".json" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    </div>
+                    <div>
+                        <label for="reviewsFile" class="block text-sm font-medium text-gray-700 mb-1">Existing Reviews (animereviews.json, optional):</label>
+                        <input type="file" id="reviewsFile" accept=".json" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    </div>
+                </div>
+                <div id="loadingMessage" class="mt-4 text-center text-blue-700 hidden">Attempting to load anime data automatically...</div>
+                <p id="lastUpdateText" class="mt-2 text-sm text-gray-600 text-center">Database last updated: 2025-05-16</p>
+                <div id="reviewLoadingMessage" class="mt-4 text-center text-blue-700 hidden">Attempting to load existing reviews from remote URL...</div>
+            </section>
 
-        <div id="messageBox" class="message-box hidden"></div>
+            <section id="animeExplorationSection" class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-600">2. Find &amp; Select Anime</h2>
+                <p class="mb-4 text-gray-600">
+                    Once your anime database is loaded, you can search for anime titles. Type in the search box below, and matching titles will appear. Click on an anime to view its details and proceed to write a review.
+                </p>
+                <div>
+                    <label for="animeSearch" class="block text-sm font-medium text-gray-700 mb-1">Search Anime Title:</label>
+                    <input type="search" id="animeSearch" placeholder="E.g., Death Note" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <div id="searchResultsContainer" class="mt-2 border border-gray-300 rounded-md bg-white"></div>
+                    <p id="displayCountMessage" class="mt-2 text-sm text-gray-500 text-center"></p>
+                </div>
+            </section>
+
+            <section id="reviewCreationSection" class="card hidden">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-600">3. Write Your Review</h2>
+                <p class="mb-4 text-gray-600">
+                    You've selected an anime! Now, please provide the episode number and your review for it. You can also add up to three screenshot URLs. Your review will be added to your collection, which you can download later.
+                </p>
+                <div id="selectedAnimeDisplay" class="mb-6 p-4 bg-indigo-50 rounded-lg">
+                    <h3 id="selectedAnimeTitle" class="text-xl font-bold text-indigo-700 mb-2"></h3>
+                    <div class="flex flex-col md:flex-row gap-4 items-start">
+                        <img id="selectedAnimeImage" src="https://placehold.co/150x220/e2e8f0/94a3b8?text=No+Image" alt="Anime Cover" class="w-36 h-auto object-cover rounded-md shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/150x220/e2e8f0/94a3b8?text=Image+Error';">
+                        <div id="selectedAnimeDetails" class="text-sm text-gray-700 space-y-1">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="episodeNumber" class="block text-sm font-medium text-gray-700 mb-1">Episode Number:</label>
+                        <input type="number" id="episodeNumber" min="1" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+
+                    <section class="card p-4"> <h2 class="text-xl font-semibold mb-3 text-indigo-600">Generative AI Assistant (Optional)</h2>
+                        <p class="mb-4 text-gray-600 text-sm">
+                            Use this assistant to generate review ideas, summaries, or anything else you might need for your anime review. The result will be added to the 'Your Review' text area above.
+                        </p>
+                        <div class="flex flex-col md:flex-row md:items-end md:space-x-4 mb-4">
+                            <div class="api-key-select flex-1 mb-2 md:mb-0">
+                                <label for="apiKeySelect" class="block text-sm font-medium text-gray-700 mb-1">Select API Key:</label>
+                                <select id="apiKeySelect" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></select>
+                            </div>
+
+                            <div class="model-select flex-1 mb-2 md:mb-0">
+                                <label for="modelSelect" class="block text-sm font-medium text-gray-700 mb-1">Select Model:</label>
+                                <select id="modelSelect" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></select>
+                            </div>
+
+                            <div>
+                                <label for="subtitleFile" class="block text-sm font-medium text-gray-700 mb-1">Load Subtitle File (.srt, .vtt, .txt):</label>
+                                <input type="file" id="subtitleFile" accept=".srt,.vtt,.txt" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            </div>
+                            &nbsp;
+                            &nbsp;
+
+                            <button id="submitBtn" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out self-end">Get AI Result</button>
+                        </div>
+
+                        <label for="promptInput" class="block text-sm font-medium text-gray-700 mb-1">Your Prompt:</label>
+                        <textarea id="promptInput" rows="4" placeholder="E.g., Write a short spoiler-free review for Death Note episode 1 focusing on the introduction of Light." class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea><br>
+                        
+                        <h3 class="text-md font-semibold mt-4 mb-2 text-indigo-600">AI Result (Editable):</h3>
+                        <textarea id="resultOutput" rows="7" class="mb-4"></textarea> 
+                        <button id="addAiReviewBtn" class="px-4 py-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out" disabled="">Add to Review Box</button>
+                    </section>
+                    <div>
+                        <label for="reviewText" class="block text-sm font-medium text-gray-700 mb-1">Your Review:</label>
+                        <textarea id="reviewText" rows="5" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="What did you think of this episode?"></textarea>
+                    </div>
+                    <div>
+                        <label for="episodeScreenshot1Url" class="block text-sm font-medium text-gray-700 mb-1">Screenshot URL 1 (optional):</label>
+                        <input type="url" id="episodeScreenshot1Url" placeholder="https://example.com/screenshot1.jpg" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="episodeScreenshot2Url" class="block text-sm font-medium text-gray-700 mb-1">Screenshot URL 2 (optional):</label>
+                        <input type="url" id="episodeScreenshot2Url" placeholder="https://example.com/screenshot2.jpg" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="episodeScreenshot3Url" class="block text-sm font-medium text-gray-700 mb-1">Screenshot URL 3 (optional):</label>
+                        <input type="url" id="episodeScreenshot3Url" placeholder="https://example.com/screenshot3.jpg" class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <button id="saveReviewBtn" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out disabled:opacity-50 w-full md:w-auto">Add Review to Collection</button>
+                </div>
+            </section>
+
+            <section id="reviewManagementSection" class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-indigo-600">4. Manage Your Reviews</h2>
+                <p class="mb-4 text-gray-600">
+                    Your reviews are collected here. Click the button below to download all your reviews as an `animereviews.json` file. You can then save this file to your computer, for example, in your `public` folder.
+                </p>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <a id="downloadReviewsLink" class="action-button px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out disabled:opacity-50 w-full md:w-auto text-center" style="display: inline-block;" href="#" download="animereviews.json">Download Reviews File</a>
+                    <button id="uploadReviewsToGithubBtn" class="action-button px-4 py-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out disabled:opacity-50 w-full md:w-auto">
+                        <span class="button-content">
+                            Update to GitHub
+                            <span id="uploadLoadingSpinner" class="loading-spinner hidden"></span>
+                        </span>
+                    </button>
+                </div>
+                <div id="reviewCount" class="mt-4 text-sm text-gray-600">You have 0 review(s) in your collection.</div>
+            </section>
+
+            <div id="messageArea" class="p-4 text-center rounded-md "></div>
+
+            </main>
+
+        <footer class="text-center text-sm text-gray-500 mt-12">
+            <p>Anime Review Manager © 2025. All interactions are local to your browser.</p>
+        </footer>
     </div>
 
     <script>
-        // --- IMPORTANT CONFIGURATION ---
-        // Replace with your GitHub username
-        const GITHUB_USERNAME = 'ashes321';
-        // Replace with your repository name
-        const REPO_NAME = 'my-text-updater';
-        // Replace with the path to your file (e.g., 'updatetext.text' or 'folder/updatetext.text')
-        const FILE_PATH = 'updatetext.text';
+        let animeData = []; // This will hold all parsed anime data from the JSON file
+        let reviewsData = []; // This will hold all user-created reviews
+        let selectedAnime = null; // Stores the currently selected anime for review
+
+        // Variables for infinite scrolling/lazy loading of anime list
+        const initialDisplayLimit = 20; // Number of anime to show initially
+        const loadMoreIncrement = 20; // Number of anime to load on each scroll
+        let currentDisplayedAnimeCount = 0; // Tracks how many anime are currently displayed
+        let filteredAnimeData = []; // This array holds the anime data after search/filters, used for display
+
+        // DOM element references
+        const animeDbFileInput = document.getElementById('animeDbFile');
+        const reviewsFileInput = document.getElementById('reviewsFile');
+        const animeSearchInput = document.getElementById('animeSearch');
+        const searchResultsContainer = document.getElementById('searchResultsContainer');
+        const displayCountMessage = document.getElementById('displayCountMessage');
+
+        const animeExplorationSection = document.getElementById('animeExplorationSection');
+        const reviewCreationSection = document.getElementById('reviewCreationSection');
+        const reviewManagementSection = document.getElementById('reviewManagementSection');
+
+        const selectedAnimeTitleDisplay = document.getElementById('selectedAnimeTitle');
+        const selectedAnimeImageDisplay = document.getElementById('selectedAnimeImage');
+        const selectedAnimeDetailsDisplay = document.getElementById('selectedAnimeDetails');
+        const episodeNumberInput = document.getElementById('episodeNumber');
+        const reviewTextInput = document.getElementById('reviewText');
+        const episodeScreenshot1UrlInput = document.getElementById('episodeScreenshot1Url');
+        const episodeScreenshot2UrlInput = document.getElementById('episodeScreenshot2Url');
+        const episodeScreenshot3UrlInput = document.getElementById('episodeScreenshot3Url');
+        const saveReviewBtn = document.getElementById('saveReviewBtn');
+        const downloadReviewsLink = document.getElementById('downloadReviewsLink');
+        const reviewCountDisplay = document.getElementById('reviewCount');
+        const messageArea = document.getElementById('messageArea');
+
+        const loadingMessage = document.getElementById('loadingMessage');
+        const lastUpdateText = document.getElementById('lastUpdateText');
+        const reviewLoadingMessage = document.getElementById('reviewLoadingMessage'); // New element for review loading status
+
+        // Generative AI Client DOM elements
+        const promptInput = document.getElementById('promptInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultOutput = document.getElementById('resultOutput'); // This is now a textarea
+        const apiKeySelect = document.getElementById('apiKeySelect');
+        const modelSelect = document.getElementById('modelSelect');
+        const addAiReviewBtn = document.getElementById('addAiReviewBtn'); // New button
+        const subtitleFileInput = document.getElementById('subtitleFile'); // New subtitle file input
+
+        // NEW: GitHub Upload DOM elements
+        const uploadReviewsToGithubBtn = document.getElementById('uploadReviewsToGithubBtn');
+        const uploadLoadingSpinner = document.getElementById('uploadLoadingSpinner');
+
+        // REPLACE THESE WITH YOUR ACTUAL KEYS!
+        const API_KEYS = {
+             "API Key 1 (Primary)": "AIzaSyDwXcH9NDf_XSzRYqfWh0jt3gdXNZUZV1Q",
+            "API Key 2 (Backup)": "AIzaSyCrFbPFynymxH1vLm18SIED8noWJquj9ms",
+            // Add more API keys as needed
+        };
+
+       const MODELS = [
+            { displayName: "Gemini 1.5 Flash", apiName: "gemini-1.5-flash" },
+           { displayName: "Gemini 2.0 Flash", apiName: "gemini-2.0-flash" },
+            { displayName: "Gemini 2.0 Flash-Lite", apiName: "gemini-2.0-flash-lite" }, // A common stable model
+            // Add other models you want to support
+        ];
+
+        // URL for the remote animereviews.json file
+        const REMOTE_REVIEWS_URL = "https://raw.githubusercontent.com/ashesworldData/animereviewsJson/refs/heads/main/animereviews.json";
+
+        // --- NEW GITHUB CONFIGURATION ---
+        // Replace with your GitHub username (from the image, it's 'ashesworldData')
+        const GITHUB_UPLOAD_USERNAME = 'ashesworldData';
+        // Replace with your repository name for reviews (from prompt, it's 'animereviewsJson')
+        const GITHUB_UPLOAD_REPO_NAME = 'animereviewsJson';
+        // Replace with the path to your reviews file (from prompt, it's 'animereviews.json')
+        const GITHUB_UPLOAD_FILE_PATH = 'animereviews.json';
         // Replace with your GitHub Personal Access Token (PAT)
         // !!! WARNING: EXPOSING PAT IN CLIENT-SIDE CODE IS A SECURITY RISK !!!
-        const GITHUB_PAT = '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';
-        // --- END CONFIGURATION ---
+        const GITHUB_UPLOAD_PAT = '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';
+        // --- END GITHUB CONFIGURATION ---
 
-        const fileContentInput = document.getElementById('fileContent');
-        const updateButton = document.getElementById('updateButton');
-        const messageBox = document.getElementById('messageBox');
-        const loadingSpinner = document.getElementById('loadingSpinner');
 
-        // Function to display messages to the user
+        // Utility function to show temporary messages to the user
         function showMessage(message, type = 'info') {
-            messageBox.textContent = message;
-            messageBox.className = `message-box ${type === 'success' ? 'message-success' : type === 'error' ? 'message-error' : 'message-info'}`;
-            messageBox.classList.remove('hidden');
+            messageArea.textContent = message;
+            messageArea.className = 'p-4 text-center rounded-md ';
+            if (type === 'success') {
+                messageArea.classList.add('bg-green-100', 'text-green-700');
+            } else if (type === 'error') {
+                messageArea.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                messageArea.classList.add('bg-blue-100', 'text-blue-700');
+            }
+            setTimeout(() => { messageArea.textContent = ''; messageArea.className = 'p-4 text-center rounded-md ';}, 5000);
         }
 
-        // Function to hide messages
-        function hideMessage() {
-            messageBox.classList.add('hidden');
+        // Function to render the anime list with lazy loading/infinite scroll
+        function renderAnimeList(append = false) {
+            if (!append) {
+                searchResultsContainer.innerHTML = ''; // Clear existing list for new search/initial load
+                currentDisplayedAnimeCount = 0;
+            }
+
+            if (filteredAnimeData.length === 0) {
+                searchResultsContainer.innerHTML = '<p class="p-3 text-gray-500">No anime found.</p>';
+                displayCountMessage.textContent = '';
+                return;
+            }
+
+            const startIndex = currentDisplayedAnimeCount;
+            const endIndex = Math.min(currentDisplayedAnimeCount + loadMoreIncrement, filteredAnimeData.length);
+
+            const ul = searchResultsContainer.querySelector('ul') || document.createElement('ul');
+            if (!ul.parentElement) { // If ul is new, append it
+                ul.className = 'divide-y divide-gray-200';
+                searchResultsContainer.appendChild(ul);
+            }
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const anime = filteredAnimeData[i];
+                const li = document.createElement('li');
+                li.className = 'p-3 cursor-pointer search-result-item hover:bg-indigo-50 flex items-center gap-4'; 
+
+                const img = document.createElement('img');
+                img.src = anime.picture || 'https://placehold.co/50x70/e2e8f0/94a3b8?text=No+Image'; // Placeholder
+                img.alt = anime.title + ' cover';
+                img.className = 'w-12 h-auto object-cover rounded shadow-sm'; // Small image for list
+
+                const titleDiv = document.createElement('div');
+                titleDiv.textContent = anime.title;
+                titleDiv.className = 'font-semibold text-gray-800'; 
+
+                li.appendChild(img);
+                li.appendChild(titleDiv);
+
+                li.addEventListener('click', () => {
+                    selectedAnime = anime;
+                    displaySelectedAnime();
+                    animeSearchInput.value = '';
+                    searchResultsContainer.innerHTML = '';
+                    reviewCreationSection.classList.remove('hidden');
+                    episodeNumberInput.value = '';
+                    reviewTextInput.value = '';
+                    episodeScreenshot1UrlInput.value = '';
+                    episodeScreenshot2UrlInput.value = '';
+                    episodeScreenshot3UrlInput.value = '';
+                    episodeNumberInput.focus();
+                });
+                ul.appendChild(li);
+            }
+            currentDisplayedAnimeCount = endIndex;
+            displayCountMessage.textContent = `Displaying ${currentDisplayedAnimeCount} of ${filteredAnimeData.length} anime titles.`;
         }
 
-        // Function to show loading spinner
-        function showLoading() {
-            loadingSpinner.classList.remove('hidden');
-            updateButton.disabled = true;
+        // Handles scrolling to load more anime
+        function handleScroll() {
+            const { scrollTop, scrollHeight, clientHeight } = searchResultsContainer;
+            // Check if user scrolled to within 50px of the bottom
+            if (scrollTop + clientHeight >= scrollHeight - 50) { 
+                if (currentDisplayedAnimeCount < filteredAnimeData.length) {
+                    renderAnimeList(true); // Append more anime
+                }
+            }
         }
 
-        // Function to hide loading spinner
-        function hideLoading() {
-            loadingSpinner.classList.add('hidden');
-            updateButton.disabled = false;
+        // Attach scroll listener to the search results container
+        searchResultsContainer.addEventListener('scroll', handleScroll);
+
+        // Function to apply filters (currently just displays all anime initially)
+        function applyAllFilters() {
+            // Initially, all anime are considered 'filtered'
+            filteredAnimeData = [...animeData]; 
+            renderAnimeList(false); // Render the first batch
         }
 
-        // Function to fetch the current file content and its SHA
-        async function getFileSha(owner, repo, path, token) {
+        // Attempts to load the anime database automatically from a relative path
+        async function fetchData() {
+            loadingMessage.classList.remove('hidden');
+            loadingMessage.textContent = 'Attempting to load anime data automatically...';
+            lastUpdateText.textContent = '';
+
+            try {
+                const response = await fetch('allAnime.json'); // Expected path in public folder
+                if (!response.ok) {
+                    let errorMessage = `HTTP error! Status: ${response.status}.`;
+                    if (response.status === 404) {
+                        errorMessage += ' File not found.';
+                    } else if (response.status >= 500) {
+                        errorMessage += ' Server error.';
+                    }
+                    throw new Error(errorMessage);
+                }
+                const fullJson = await response.json();
+                animeData = fullJson.data || []; // Store all anime data
+                
+                if (fullJson.lastUpdate) {
+                    lastUpdateText.textContent = `Database last updated: ${fullJson.lastUpdate}`;
+                } else {
+                    lastUpdateText.textContent = 'Database last update date not available.';
+                }
+
+                loadingMessage.classList.add('hidden');
+                
+                applyAllFilters(); // This will now trigger the initial display of 20 anime
+
+                animeExplorationSection.classList.remove('hidden'); // Show search section
+                if (reviewsData.length > 0) {
+                    reviewManagementSection.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error("Failed to load anime data:", error);
+                loadingMessage.textContent = `Automatic load of anime database failed. Error: ${error.message}.
+                This usually happens because the application cannot access 'allAnime.json' directly from your local file system or a restricted browser environment (like a 'blob:' URL).
+                To fix this:
+                1. Run a local web server (e.g., Python's 'http.server' or Node.js 'http-server') from your 'public' folder and access the page via 'http://localhost:PORT/'.
+                OR
+                2. Manually load the 'allAnime.json' file using the "Anime Database (.json)" file input above.`;
+                loadingMessage.classList.add('hidden');
+                searchResultsContainer.innerHTML = ''; 
+                lastUpdateText.textContent = 'Could not fetch update date.';
+                animeExplorationSection.classList.add('hidden'); 
+            }
+        }
+
+        // Function to load existing reviews from the remote URL
+        async function loadReviewsFromUrl() {
+            reviewLoadingMessage.classList.remove('hidden');
+            reviewLoadingMessage.textContent = 'Attempting to load existing reviews from remote URL...';
+
+            try {
+                const response = await fetch(REMOTE_REVIEWS_URL);
+                if (!response.ok) {
+                    let errorMessage = `HTTP error! Status: ${response.status}.`;
+                    if (response.status === 404) {
+                        errorMessage += ' File not found.';
+                    } else if (response.status >= 500) {
+                        errorMessage += ' Server error.';
+                    }
+                    throw new Error(errorMessage);
+                }
+                const jsonData = await response.json();
+                if (Array.isArray(jsonData)) {
+                    reviewsData = jsonData;
+                    showMessage(`Loaded ${reviewsData.length} existing reviews from remote URL.`, 'success');
+                } else {
+                    throw new Error("Invalid reviews file format from remote URL. Expected an array of reviews.");
+                }
+            } catch (error) {
+                console.error("Failed to load reviews from remote URL:", error);
+                showMessage(`Error loading reviews from remote URL: ${error.message}.`, 'error');
+            } finally {
+                reviewLoadingMessage.classList.add('hidden');
+                updateReviewManagementSection(); // Update review count and download link
+                if (reviewsData.length > 0 && animeData.length > 0) { // Only show if anime data is also loaded
+                    reviewManagementSection.classList.remove('hidden');
+                }
+            }
+        }
+
+
+        // Event listener for manual anime database file selection
+        animeDbFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const jsonData = JSON.parse(e.target.result);
+                        if (jsonData && Array.isArray(jsonData.data)) {
+                            animeData = jsonData.data;
+                            showMessage('Anime database loaded successfully from selected file!', 'success');
+                            animeExplorationSection.classList.remove('hidden');
+                            applyAllFilters(); // Display all anime after manual load (first batch)
+                            if (reviewsData.length > 0) {
+                                reviewManagementSection.classList.remove('hidden');
+                            }
+                            if (jsonData.lastUpdate) {
+                                lastUpdateText.textContent = `Database last updated: ${jsonData.lastUpdate}`;
+                            } else {
+                                lastUpdateText.textContent = 'Database last update date not available.';
+                            }
+                            loadingMessage.classList.add('hidden');
+                        } else {
+                            throw new Error("Invalid anime database format. Expected a 'data' array.");
+                        }
+                    } catch (error) {
+                        animeData = [];
+                        showMessage(`Error loading anime database from selected file: ${error.message}`, 'error');
+                        animeExplorationSection.classList.add('hidden');
+                        lastUpdateText.textContent = 'Could not fetch update date.';
+                        loadingMessage.classList.add('hidden');
+                    }
+                };
+                reader.onerror = () => {
+                    showMessage('Failed to read anime database file.', 'error');
+                    animeExplorationSection.classList.add('hidden');
+                    lastUpdateText.textContent = 'Could not fetch update date.';
+                    loadingMessage.classList.add('hidden');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Event listener for existing reviews file selection (manual load)
+        reviewsFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const jsonData = JSON.parse(e.target.result);
+                        if (Array.isArray(jsonData)) {
+                            reviewsData = jsonData;
+                            showMessage(`Loaded ${reviewsData.length} existing reviews from selected file.`, 'success');
+                            updateReviewManagementSection();
+                            if (animeData.length > 0) { 
+                                reviewManagementSection.classList.remove('hidden');
+                            }
+                        } else {
+                           throw new Error("Invalid reviews file format. Expected an array of reviews.");
+                        }
+                    } catch (error) {
+                        reviewsData = []; 
+                        showMessage(`Error loading reviews file: ${error.message}`, 'error');
+                        updateReviewManagementSection(); 
+                    }
+                };
+                reader.onerror = () => {
+                    showMessage('Failed to read reviews file.', 'error');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Event listener for subtitle file selection
+        subtitleFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileContent = e.target.result;
+                    // Append the content to the prompt input box, adding newlines for separation
+                    promptInput.value += (promptInput.value.trim() ? "\n\n" : "") + fileContent; 
+                    showMessage('Subtitle content loaded into the prompt box!', 'success');
+                };
+                reader.onerror = () => {
+                    showMessage('Failed to read subtitle file.', 'error');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        
+        // Event listener for anime search input
+        animeSearchInput.addEventListener('input', () => {
+            const searchTerm = animeSearchInput.value.toLowerCase();
+            
+            if (searchTerm.length < 2) { 
+                filteredAnimeData = [...animeData];
+            } else {
+                filteredAnimeData = animeData.filter(anime => 
+                    anime.title.toLowerCase().includes(searchTerm) || 
+                    (anime.synonyms && anime.synonyms.some(s => s.toLowerCase().includes(searchTerm)))
+                );
+            }
+            renderAnimeList(false); 
+        });
+        
+        // Helper function to format duration objects
+        function formatDuration(durationObj) {
+            if (!durationObj || typeof durationObj.value !== 'number' || !durationObj.unit) {
+                return 'N/A';
+            }
+            const value = durationObj.value;
+            const unit = durationObj.unit.toLowerCase();
+            if (unit === 'seconds') {
+                return `${Math.round(value / 60)} min`;
+            } else if (unit === 'minutes') {
+                return `${value} min`;
+            }
+            return `${value} ${unit}`;
+        }
+
+        // Displays details of the selected anime
+        function displaySelectedAnime() {
+            if (!selectedAnime) return;
+            selectedAnimeTitleDisplay.textContent = selectedAnime.title;
+            selectedAnimeImageDisplay.src = selectedAnime.picture || 'https://placehold.co/150x220/e2e8f0/94a3b8?text=No+Image';
+            
+            let detailsHtml = `<p><strong>Type:</strong> ${selectedAnime.type || 'N/A'}</p>`;
+            detailsHtml += `<p><strong>Episodes:</strong> ${selectedAnime.episodes || 'N/A'}</p>`;
+            detailsHtml += `<p><strong>Status:</strong> ${selectedAnime.status || 'N/A'}</p>`;
+            if (selectedAnime.animeSeason) {
+                detailsHtml += `<p><strong>Season:</strong> ${selectedAnime.animeSeason.season || ''} ${selectedAnime.animeSeason.year || ''}</p>`;
+            }
+            if (selectedAnime.duration) {
+                detailsHtml += `<p><strong>Duration/Ep:</strong> ${formatDuration(selectedAnime.duration)}</p>`;
+            }
+            if (selectedAnime.score && typeof selectedAnime.score.arithmeticMean === 'number') {
+                detailsHtml += `<p><strong>Avg. Score:</strong> ${selectedAnime.score.arithmeticMean.toFixed(2)}</p>`;
+            }
+            if (selectedAnime.tags && selectedAnime.tags.length > 0) {
+                detailsHtml += `<p class="mt-2"><strong>Tags:</strong> <span class="text-xs">${selectedAnime.tags.slice(0,10).join(', ')}${selectedAnime.tags.length > 10 ? '...' : ''}</span></p>`;
+            }
+            selectedAnimeDetailsDisplay.innerHTML = detailsHtml;
+        }
+        
+        // Event listener for saving a review
+        saveReviewBtn.addEventListener('click', () => {
+            if (!selectedAnime) {
+                showMessage('Please select an anime first.', 'error');
+                return;
+            }
+            const episode = parseInt(episodeNumberInput.value);
+            const reviewText = reviewTextInput.value.trim();
+            const episodeScreenshots = [];
+            if (episodeScreenshot1UrlInput.value.trim()) {
+                episodeScreenshots.push(episodeScreenshot1UrlInput.value.trim());
+            }
+            if (episodeScreenshot2UrlInput.value.trim()) {
+                episodeScreenshots.push(episodeScreenshot2UrlInput.value.trim());
+            }
+            if (episodeScreenshot3UrlInput.value.trim()) {
+                episodeScreenshots.push(episodeScreenshot3UrlInput.value.trim());
+            }
+
+            if (isNaN(episode) || episode < 1) {
+                showMessage('Please enter a valid episode number.', 'error');
+                episodeNumberInput.focus();
+                return;
+            }
+            if (reviewText === '') {
+                showMessage('Please write a review.', 'error');
+                reviewTextInput.focus();
+                return;
+            }
+
+            const newReview = {
+                reviewId: crypto.randomUUID(),
+                animeTitle: selectedAnime.title,
+                animeSources: selectedAnime.sources, 
+                episodeNumber: episode,
+                reviewText: reviewText,
+                reviewTimestamp: new Date().toISOString(),
+                animePicture: selectedAnime.picture,
+                animeType: selectedAnime.type,
+                totalEpisodes: selectedAnime.episodes,
+                episodeScreenshots: episodeScreenshots 
+            };
+
+            reviewsData.push(newReview);
+            showMessage(`Review for ${selectedAnime.title} - Episode ${episode} added!`, 'success');
+            
+            episodeNumberInput.value = '';
+            reviewTextInput.value = '';
+            episodeScreenshot1UrlInput.value = '';
+            episodeScreenshot2UrlInput.value = '';
+            episodeScreenshot3UrlInput.value = '';
+
+            updateReviewManagementSection();
+            reviewManagementSection.classList.remove('hidden'); 
+        });
+
+        // Updates the review management section with current review count and download link
+        function updateReviewManagementSection() {
+            reviewCountDisplay.textContent = `You have ${reviewsData.length} review(s) in your collection.`;
+            if (reviewsData.length > 0) {
+                const jsonDataStr = JSON.stringify(reviewsData, null, 2);
+                const blob = new Blob([jsonDataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                downloadReviewsLink.href = url;
+                downloadReviewsLink.download = 'animereviews.json';
+                downloadReviewsLink.style.display = 'inline-block';
+                uploadReviewsToGithubBtn.disabled = false; // Enable upload button if reviews exist
+            }
+            else {
+                downloadReviewsLink.style.display = 'none';
+                uploadReviewsToGithubBtn.disabled = true; // Disable if no reviews
+            }
+        }
+
+        // --- Generative AI Client Functions ---
+
+        // Function to populate API Key and Model dropdowns
+        function populateDropdowns() {
+            // Populate API Key dropdown
+            apiKeySelect.innerHTML = '<option value="">Select an API Key</option>'; // Add a default option
+            for (const keyName in API_KEYS) {
+                const option = document.createElement('option');
+                option.value = API_KEYS[keyName];
+                option.textContent = keyName;
+                apiKeySelect.appendChild(option);
+            }
+
+            // Populate Model dropdown
+            modelSelect.innerHTML = '<option value="">Select a Model</option>'; // Add a default option
+            MODELS.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.apiName;
+                option.textContent = model.displayName;
+                modelSelect.appendChild(option);
+            });
+        }
+
+        // Event Listener for AI Submit Button
+        submitBtn.addEventListener('click', async () => {
+            const prompt = "Summarize this episode in 3 paragraphs (starting, middle, end) with intro and outro in a simple, friendly local boy talking and add suitable emojis in between emotions that occurred in the episode. Format: intro, summary, review(but dont include this title), summary, review(but dont include this title), summary, review(but dont include this title), outro. Do not include user interaction text in result result is just paragraphs itself(dont include titles like summery,review...). " + promptInput.value.trim();
+            const selectedApiKey = apiKeySelect.value;
+            const selectedModel = modelSelect.value;
+
+            if (!promptInput.value.trim()) {
+                resultOutput.value = "Please enter a prompt."; // Use .value for textarea
+                showMessage("Please enter a prompt for the AI.", 'error');
+                return;
+            }
+            if (!selectedApiKey) {
+                resultOutput.value = "Please select an API Key.";
+                showMessage("Please select an API Key.", 'error');
+                return;
+            }
+            if (!selectedModel) {
+                resultOutput.value = "Please select a Model.";
+                showMessage("Please select an AI model.", 'error');
+                return;
+                }
+
+            resultOutput.value = "Generating...";
+            submitBtn.disabled = true; // Disable button during generation
+            addAiReviewBtn.disabled = true; // Disable add button as well
+            showMessage("Generating AI content...", 'info');
+
+            try {
+                const API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
+                const response = await fetch(`${API_BASE_URL}/models/${selectedModel}:generateContent?key=${selectedApiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.error ? errorData.error.message : 'Unknown API error';
+                    throw new Error(`API error: ${response.status} ${response.statusText} - ${errorMessage}`);
+                }
+
+                const data = await response.json();
+                const generatedText = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : 'No result generated.';
+
+                resultOutput.value = generatedText; // Set the value of the textarea
+                showMessage("AI content generated! You can now edit it or add it to your review.", 'success');
+                addAiReviewBtn.disabled = false; // Enable add button after content is generated
+
+            } catch (error) {
+                console.error("Error calling Generative AI API:", error);
+                resultOutput.value = `Error: ${error.message}`;
+                showMessage(`Error generating AI content: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false; // Re-enable generate button
+            }
+        });
+
+        // Event listener for the new "Add to Review Box" button
+        addAiReviewBtn.addEventListener('click', () => {
+            const currentAiResult = resultOutput.value.trim();
+            if (currentAiResult) {
+                // Append the generated text to the existing review text, adding newlines for separation
+                reviewTextInput.value += (reviewTextInput.value.trim() ? "\n\n" : "") + currentAiResult;
+                showMessage("AI content added to review box!", 'success');
+            } else {
+                showMessage("There's no AI content to add.", 'error');
+            }
+        });
+
+        // --- NEW GITHUB UPLOAD FUNCTIONS ---
+
+        // Function to fetch the current file content and its SHA from GitHub
+        async function getGitHubFileSha(owner, repo, path, token) {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             try {
                 const response = await fetch(url, {
@@ -183,30 +843,42 @@
                     }
                 });
 
+                if (response.status === 404) {
+                    // File does not exist, return null SHA and empty content
+                    return { content: '', sha: null };
+                }
+
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(`Failed to fetch file SHA: ${response.status} - ${errorData.message || response.statusText}`);
+                    throw new Error(`Failed to fetch file SHA from GitHub: ${response.status} - ${errorData.message || response.statusText}`);
                 }
 
                 const data = await response.json();
                 // Return both content and SHA
                 return { content: atob(data.content), sha: data.sha };
             } catch (error) {
-                console.error('Error fetching file SHA:', error);
+                console.error('Error fetching file SHA from GitHub:', error);
                 throw error; // Re-throw to be caught by the calling function
             }
         }
 
-        // Function to update the file content
-        async function updateGitHubFile(owner, repo, path, newContent, sha, token) {
+        // Function to update/create the file content on GitHub
+        async function updateOrCreateGitHubFile(owner, repo, path, content, sha, token) {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            const base64Content = btoa(newContent); // Encode content to Base64
+            // Correctly encode UTF-8 string to Base64
+            const base64Content = btoa(unescape(encodeURIComponent(content)));
 
             const payload = {
-                message: `Update ${path} from web app`, // Commit message
+                message: `Update ${path} from Anime Review Manager web app`, // Commit message
                 content: base64Content,
-                sha: sha // Required for updating existing files
             };
+
+            if (sha) {
+                payload.sha = sha; // Required for updating existing files
+            } else {
+                // If SHA is null, it means the file doesn't exist, so GitHub will create it.
+                // No need to add SHA for creation.
+            }
 
             try {
                 const response = await fetch(url, {
@@ -227,71 +899,86 @@
                 const data = await response.json();
                 return data; // Returns commit information
             } catch (error) {
-                console.error('Error updating file:', error);
+                console.error('Error updating/creating file on GitHub:', error);
                 throw error;
             }
         }
 
-        // Event listener for the update button
-        updateButton.addEventListener('click', async () => {
-            hideMessage(); // Clear previous messages
-            showLoading(); // Show loading spinner
+        // Event listener for the "Update to GitHub" button
+        uploadReviewsToGithubBtn.addEventListener('click', async () => {
+            showMessage(''); // Clear previous messages
+            uploadReviewsToGithubBtn.disabled = true;
+            uploadLoadingSpinner.classList.remove('hidden');
 
-            const newText = fileContentInput.value;
-
-            // Basic validation
-            if (!newText.trim()) {
-                showMessage('Please enter some text to update.', 'error');
-                hideLoading();
+            if (reviewsData.length === 0) {
+                showMessage('No reviews to upload to GitHub.', 'error');
+                uploadReviewsToGithubBtn.disabled = false;
+                uploadLoadingSpinner.classList.add('hidden');
                 return;
             }
 
-            if (GITHUB_USERNAME === 'YOUR_GITHUB_USERNAME' || REPO_NAME === 'YOUR_REPO_NAME' || GITHUB_PAT === 'YOUR_PERSONAL_ACCESS_TOKEN') {
-                showMessage('Please configure GITHUB_USERNAME, REPO_NAME, and GITHUB_PAT in the script.', 'error');
-                hideLoading();
+            // Check for placeholder PAT
+            if (GITHUB_UPLOAD_PAT === 'YOUR_PERSONAL_ACCESS_TOKEN_FOR_ANIMEREVIEWSJSON') {
+                showMessage('Please replace "YOUR_PERSONAL_ACCESS_TOKEN_FOR_ANIMEREVIEWSJSON" with your actual GitHub PAT in the script.', 'error');
+                uploadReviewsToGithubBtn.disabled = false;
+                uploadLoadingSpinner.classList.add('hidden');
                 return;
             }
+            // Also check if other config variables are still placeholders
+            if (GITHUB_UPLOAD_USERNAME === 'YOUR_GITHUB_USERNAME' || GITHUB_UPLOAD_REPO_NAME === 'YOUR_REPO_NAME') {
+                showMessage('Please configure GITHUB_UPLOAD_USERNAME and GITHUB_UPLOAD_REPO_NAME in the script for GitHub upload.', 'error');
+                uploadReviewsToGithubBtn.disabled = false;
+                uploadLoadingSpinner.classList.add('hidden');
+                return;
+            }
+
 
             try {
-                // 1. Get the current file's content and SHA
-                showMessage('Fetching current file content...', 'info');
-                const { sha: currentSha, content: currentContent } = await getFileSha(GITHUB_USERNAME, REPO_NAME, FILE_PATH, GITHUB_PAT);
-                fileContentInput.value = newText; // Ensure the input reflects what was typed
+                // 1. Get the current file's SHA (if it exists)
+                showMessage('Fetching current animereviews.json SHA from GitHub...', 'info');
+                const { sha: currentSha } = await getGitHubFileSha(
+                    GITHUB_UPLOAD_USERNAME,
+                    GITHUB_UPLOAD_REPO_NAME,
+                    GITHUB_UPLOAD_FILE_PATH,
+                    GITHUB_UPLOAD_PAT
+                );
 
-                // 2. Update the file
-                showMessage('Updating file on GitHub...', 'info');
-                const result = await updateGitHubFile(GITHUB_USERNAME, REPO_NAME, FILE_PATH, newText, currentSha, GITHUB_PAT);
+                // 2. Prepare the new content
+                const newContent = JSON.stringify(reviewsData, null, 2);
 
-                showMessage(`File updated successfully! Commit SHA: ${result.commit.sha.substring(0, 7)}`, 'success');
-                console.log('Update successful:', result);
+                // 3. Update or create the file on GitHub
+                showMessage('Uploading reviews to GitHub...', 'info');
+                const result = await updateOrCreateGitHubFile(
+                    GITHUB_UPLOAD_USERNAME,
+                    GITHUB_UPLOAD_REPO_NAME,
+                    GITHUB_UPLOAD_FILE_PATH,
+                    newContent,
+                    currentSha,
+                    GITHUB_UPLOAD_PAT
+                );
+
+                showMessage(`Reviews uploaded successfully to GitHub! Commit SHA: ${result.commit.sha.substring(0, 7)}`, 'success');
+                console.log('GitHub upload successful:', result);
             } catch (error) {
-                showMessage(`Failed to update file: ${error.message}`, 'error');
-                console.error('Update failed:', error);
+                showMessage(`Failed to upload reviews to GitHub: ${error.message}`, 'error');
+                console.error('GitHub upload failed:', error);
             } finally {
-                hideLoading(); // Hide loading spinner regardless of success or failure
+                uploadReviewsToGithubBtn.disabled = false;
+                uploadLoadingSpinner.classList.add('hidden');
             }
         });
 
-        // Optional: Load current content when the page loads
+        // Initial state: Attempt to load the anime database automatically on page load
         window.onload = async () => {
-            if (GITHUB_USERNAME === 'YOUR_GITHUB_USERNAME' || REPO_NAME === 'YOUR_REPO_NAME' || GITHUB_PAT === 'YOUR_PERSONAL_ACCESS_TOKEN') {
-                showMessage('Please configure GITHUB_USERNAME, REPO_NAME, and GITHUB_PAT in the script.', 'error');
-                return;
-            }
-            showMessage('Loading current file content...', 'info');
-            try {
-                const { content: currentContent } = await getFileSha(GITHUB_USERNAME, REPO_NAME, FILE_PATH, GITHUB_PAT);
-                fileContentInput.value = currentContent;
-                showMessage('Current file content loaded.', 'success');
-            } catch (error) {
-                showMessage(`Failed to load current file content: ${error.message}`, 'error');
-            } finally {
-                // Hide info message after a short delay if successful
-                if (messageBox.classList.contains('message-success')) {
-                    setTimeout(hideMessage, 3000);
-                }
-            }
+            // Load anime database first
+            await fetchData(); 
+            // Then load existing reviews from the remote URL
+            await loadReviewsFromUrl();
+            populateDropdowns(); // Populate AI dropdowns on load
+            addAiReviewBtn.disabled = true; // Initially disable the "Add to Review Box" button
+            updateReviewManagementSection(); // Set initial state of upload button
         };
     </script>
-</body>
-</html>
+
+
+</body></html>

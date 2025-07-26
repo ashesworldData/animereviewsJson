@@ -223,5 +223,20 @@
     "animeType": "TV",
     "totalEpisodes": 12,
     "episodeScreenshots": []
+  },
+  {
+    "reviewId": "90558da1-9499-4295-b7c5-39858f69df36",
+    "animeTitle": "Guimi Zhi Zhu",
+    "animeSources": [
+      "https://animecountdown.com/2823778",
+      "https://simkl.com/anime/2823778"
+    ],
+    "episodeNumber": 6,
+    "reviewText": "Welcome, fellow Beyonders and enthusiasts! We're diving into a captivating episode of Lord of Mysteries ONA that truly sets the stage for a world brimming with Beyonders, their intricate powers, and the perilous journey of our protagonist, Klein. This episode was a masterclass in world-building and tension, leaving a lasting impression.\n\nThis episode immediately immerses you in the fascinating world of Beyonders, expertly establishing a compelling power hierarchy that keeps you hooked from the start. The handling of the wraith in the castle was genuinely intense and a highlight, showcasing the series' ability to deliver gripping moments. I particularly enjoyed the dynamic between the captain and his team, whose investigation efforts were a joy to watch. Our hero, Klein, demonstrates remarkable bravery when confronting the ancient and powerful wraith, solidifying his role as a compelling lead.\n\nThe narrative gains significant momentum with the introduction of the mutated sacred emblem, a twist that adds another layer of intrigue. The divination scene was visually captivating and expertly built tension, making it a standout moment. The pacing felt perfect throughout, culminating in a significant reveal about the true power of the Sun Pathway. You can genuinely feel Klein's exhaustion and the heavy weight of his dangerous new discoveries, adding a human touch to his extraordinary circumstances. Finally, the connections drawn between Mr. Azik and the ancient painting open up intriguing possibilities for future developments.\n\nOverall, this episode was a fantastic continuation, building on the established lore while pushing the plot forward with exciting reveals and intense encounters. It leaves you eager to uncover more of the mysteries within this enthralling universe. What were your favorite moments, and what are your theories about Mr. Azik? Let us know!",
+    "reviewTimestamp": "2025-07-26T06:10:11.732Z",
+    "animePicture": "https://simkl.in/posters/18/181137271b524f7db9_m.webp",
+    "animeType": "ONA",
+    "totalEpisodes": 8,
+    "episodeScreenshots": []
   }
 ]
